@@ -20,6 +20,7 @@ import {
 import Link from 'next/link';
 import { getUserPermissions, updateLastLogin } from '@/lib/auth';
 import { Permission, UserRole } from '@/lib/types';
+import PartnerIcon from '@/components/PartnerIcon';
 
 type Partner = {
   id: string;
@@ -220,9 +221,12 @@ export default function HomePage() {
   return (
     <div className="min-h-screen p-6">
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">파트너 관리 대시보드</h1>
-          <p className="text-sm text-gray-600">환영합니다, {user.email}</p>
+        <div className="flex items-center gap-3">
+          <PartnerIcon size={48} />
+          <div>
+            <h1 className="text-2xl font-bold">파트너 관리 대시보드</h1>
+            <p className="text-sm text-gray-600">환영합니다, {user.email}</p>
+          </div>
         </div>
         <div className="flex gap-2">
           <Link
