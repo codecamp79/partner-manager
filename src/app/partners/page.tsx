@@ -38,8 +38,14 @@ const RATING_LABELS = {
 };
 
 export default function PartnersPage() {
-  // 빌드 시 오류 방지를 위해 기본값 사용
-  const searchParams = new URLSearchParams();
+  // 클라이언트 사이드에서만 useSearchParams 사용
+  const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setSearchParams(new URLSearchParams(window.location.search));
+    }
+  }, []);
   const [rows, setRows] = useState<PartnerRow[]>([]);
   const [filteredRows, setFilteredRows] = useState<PartnerRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -225,8 +231,8 @@ const downloadCSV = async () => {
     
     // URL 쿼리 파라미터 필터 적용
     const filter = searchParams.get('filter');
-    const scope = searchParams.get('scope');
-    const rating = searchParams.get('rating');
+    const scope = searchParams?.get('scope');
+    const rating = searchParams?.get('rating');
     
     if (filter) {
       switch (filter) {
