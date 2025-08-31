@@ -10,8 +10,6 @@ import {
   orderBy,
   query,
   Timestamp,
-  getDocs,
-  where,
 } from 'firebase/firestore';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
@@ -52,94 +50,7 @@ function PartnersPageContent() {
   // 사용자 권한
   const [permissions, setPermissions] = useState<Permission | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  // CSV 다운로드
-  // CSV 다운로드 — 최신 평가(점수/등급/메모) 포함
-const downloadCSV = async () => {
-  // 등급 라벨 맵
-  const LABELS: Record<string, string> = {
-    GOOD: '굿파트너',
-    OK: '그럭저럭 파트너',
-    CAUTION: '주의필요 파트너',
-    UNTRUSTWORTHY: '믿을 수 없는 파트너',
-  };
-  const escapeCsv = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
 
-  // 각 파트너의 최신 평가 가져오기
-  const latestByPartnerId = new Map<
-    string,
-    { score?: number; label?: string; memo?: string }
-  >();
-
-  await Promise.all(
-    rows.map(async (r) => {
-      try {
-        const snaps = await getDocs(
-          query(collection(db, 'evaluations'), where('partnerId', '==', r.id))
-        );
-        let maxVer = -1;
-        let best: { score?: number; label?: string; memo?: string } | null = null;
-
-        snaps.forEach((s) => {
-          const d = s.data() as any;
-          const ver = Number(d.version) || 0;
-          if (ver > maxVer) {
-            maxVer = ver;
-            best = {
-              score: typeof d.totalScore === 'number' ? d.totalScore : undefined,
-              label: LABELS[d.rating as string] ?? (d.rating as string) ?? '',
-              memo: typeof d.note === 'string' ? d.note : '',
-            };
-          }
-        });
-
-        if (best) latestByPartnerId.set(r.id, best);
-      } catch {
-        // 에러면 해당 파트너의 평가 정보는 비워둠
-      }
-    })
-  );
-
-  // CSV 만들기 (평가 컬럼 추가)
-  const header = [
-    'id',
-    'scope',
-    'country',
-    'name',
-    'org',
-    'email',
-    'phone',
-    'createdAt',
-    'latestScore',
-    'latestRating',
-    'latestMemo',
-  ];
-  const lines = rows.map((r) => {
-    const created = r.createdAt?.toDate ? r.createdAt.toDate().toISOString() : '';
-    const latest = latestByPartnerId.get(r.id);
-    return [
-      r.id,
-      r.scope,
-      r.country,
-      r.name,
-      r.org,
-      r.email ?? '',
-      r.phone ?? '',
-      created,
-      latest?.score ?? '',    // 점수
-      latest?.label ?? '',    // 평가상태
-      latest?.memo ?? '',     // 메모
-    ].map(escapeCsv).join(',');
-  });
-
-  const csv = [header.join(','), ...lines].join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `partners_${new Date().toISOString().slice(0, 10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-};
 
 
   // 사용자 권한 로드
@@ -308,15 +219,7 @@ const downloadCSV = async () => {
           >
             대시보드
           </Link>
-          {permissions?.canExportData && (
-            <button
-              onClick={downloadCSV}
-              className="rounded-xl border px-4 py-2 hover:shadow"
-              title="현재 목록을 CSV로 저장합니다."
-            >
-              CSV 다운로드
-            </button>
-          )}
+
           <Link
             href="/partners/new"
             className="rounded-xl border px-4 py-2 hover:shadow"
