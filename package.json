@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "deploy": "firebase deploy",
+    "deploy:safe": "./deploy.sh"
   },
   "dependencies": {
     "firebase": "^12.2.1",

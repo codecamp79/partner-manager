@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { db } from '@/lib/firebase';
@@ -37,7 +37,7 @@ const RATING_LABELS = {
   UNTRUSTWORTHY: '믿을 수 없는 파트너',
 };
 
-export default function PartnersPage() {
+function PartnersPageContent() {
   const searchParams = useSearchParams();
   const [rows, setRows] = useState<PartnerRow[]>([]);
   const [filteredRows, setFilteredRows] = useState<PartnerRow[]>([]);
@@ -418,5 +418,13 @@ const downloadCSV = async () => {
         * 상세/평가/검색/CSV/삭제/복원은 다음 단계에서 차례대로 붙입니다.
       </div>
     </div>
+  );
+}
+
+export default function PartnersPage() {
+  return (
+    <Suspense fallback={<div>로딩 중...</div>}>
+      <PartnersPageContent />
+    </Suspense>
   );
 }
