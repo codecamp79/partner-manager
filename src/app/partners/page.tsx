@@ -227,12 +227,14 @@ const downloadCSV = async () => {
 
   // 검색 및 필터링
   useEffect(() => {
+    if (!searchParams) return;
+    
     let filtered = [...rows];
     
     // URL 쿼리 파라미터 필터 적용
     const filter = searchParams.get('filter');
-    const scope = searchParams?.get('scope');
-    const rating = searchParams?.get('rating');
+    const scope = searchParams.get('scope');
+    const rating = searchParams.get('rating');
     
     if (filter) {
       switch (filter) {
@@ -289,20 +291,20 @@ const downloadCSV = async () => {
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-semibold">
           파트너 목록
-          {searchParams.get('filter') && (
+          {searchParams?.get('filter') && (
             <span className="text-sm font-normal text-gray-600 ml-2">
               ({searchParams.get('filter') === 'evaluated' && '평가 완료'}
               {searchParams.get('filter') === 'unevaluated' && '평가 미완료'}
               {searchParams.get('filter') === 'recent' && '최근 30일 등록'})
             </span>
           )}
-          {searchParams.get('scope') && (
+          {searchParams?.get('scope') && (
             <span className="text-sm font-normal text-gray-600 ml-2">
               ({searchParams.get('scope') === 'domestic' && '국내 파트너'}
               {searchParams.get('scope') === 'overseas' && '해외 파트너'})
             </span>
           )}
-          {searchParams.get('rating') && (
+          {searchParams?.get('rating') && (
             <span className="text-sm font-normal text-gray-600 ml-2">
               ({RATING_LABELS[searchParams.get('rating') as keyof typeof RATING_LABELS] || searchParams.get('rating')})
             </span>
